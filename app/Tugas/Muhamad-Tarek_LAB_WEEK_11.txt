@@ -1,0 +1,85 @@
+Nama		: Muhamad Tarekh
+NIM		: 00000108776
+Mata Kuliah	: Mobile Application Proggramming IF57-D
+============================================================
+
+Link github LAB_WEEK_11_A :
+Link github LAB_WEEK_11_B :
+
+ASSIGNMENT File :
+app > Tugas > Muhamad-Tarekh_LAB_WEEK_11.txt
+
+Hasil ScreenShoot dan Build APK sudah di dalam Prject dengan nama Folder
+Folder_APK_Week11
+Folder_Image_Week11
+
+path :	directory app>Folder_APK_Week11
+
+	directory app>Folder_Image_Week11
+
+ASSIGNMENT :
+1. 	When a user takes a picture, that picture is stored in a path based on the given
+	URI. In which part of the code handles this? (Copy that part of the code as the
+	answer)
+
+	Jawaban :	Bagian kode yang menangani ini adalah method insertImageToStore dan insertToStore dalam ProviderFileManager.kt
+		
+		codenya sebagai berikut :
+
+		fun insertImageToStore(fileInfo: FileInfo?) {
+			fileInfo?.let {
+				insertToStore(
+					it,
+					mediaContentHelper.getImageContentUri(),
+					mediaContentHelper.generateImageContentValues(it)
+				)
+			}
+		}
+
+
+		private fun insertToStore(
+			fileInfo: Fileinfo,
+			contentUri: Uri,
+			contentValues: ContentValues
+		){
+			executor.execute {
+				val insertedUri = contentResolver.insert(contentUri, contentValues)
+            			insertedUri?.let {
+                			val inputStream = contentResolver.openInputStream(fileInfo.uri)
+                			val outputStream = contentResolver.openOutputStream(insertedUri)
+                			inputStream?.use { input ->
+                    				outputStream?.use { output ->
+                        				IOUtils.copy(input, output)
+                    				}
+                			}
+            			}
+        		}
+    		}
+
+ 
+2. 	n your FileInfo.kt, there are 5 attributes. On the first attribute, what does the URI
+	refer to? And on the fourth attribute, what does relativePath refer to?
+
+	Jawaban : 
+		URI merujuk pada Uniform Resource Identifier yang menunjukkan lokasi
+		sementara file melalui FileProvider, digunakan untuk akses aman ke file.
+		
+		relativePath merujuk pada path relatif di dalam storage eksternal di mana file disimpan, 
+		seperti "Pictures" atau "Movies" relatif terhadap direktori app.
+		Penjelasan: URI adalah identifier unik untuk file, 
+		sementara relativePath adalah jalur relatif untuk penyimpanan di MediaStore.
+
+3. 	[Bonus] Explain the chronological order from when a user takes a picture until
+	the file is stored in the MediaStore.
+
+		Jawaban : Uruntan Kronologis
+				1. Pengguna menekan button photo di MainActivity, yang memanggil checkStoragePermission untuk memeriksa izin (jika diperlukan).
+				2. Jika izin diberikan, panggil openImageCapture(), yang menghasilkan FileInfo menggunakan generatePhotoUri (membuat nama file, file object, URI, dll.).
+				3. Luncurkan takePictureLauncher dengan URI dari FileInfo, yang membuka kamera untuk mengambil gambar dan menyimpan hasil ke URI sementara.
+				4. SLuncurkan takePictureLauncher dengan URI dari FileInfo, yang membuka kamera untuk mengambil gambar dan menyimpan hasil ke URI sementara.
+				5. Di dalamnya, panggil insertToStore yang menjalankan executor untuk :
+					- Insert ContentValues ke MediaStore untuk mendapatkan insertedUri baru.
+					- Salin data dari inputStream (URI sementara) ke outputStream (insertedUri di MediaStore).
+				6. File sekarang disimpan di MediaStore dan dapat diakses dari Galeri.
+					Penjelasan: Proses ini memastikan penyimpanan aman dan kompatibel dengan versi Android berbeda.
+
