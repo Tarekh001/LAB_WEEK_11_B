@@ -37,6 +37,8 @@ android {
 
 dependencies {
 
+    implementation("commons-io:commons-io:2.21.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
